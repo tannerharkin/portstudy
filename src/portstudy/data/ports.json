@@ -1,0 +1,266 @@
+{
+    "20": {
+        "protocol": "FTP (Data)",
+        "description": "Channel for transferring actual file content",
+        "transport": "TCP",
+        "common_usage": "Transferring files between client and server",
+        "difficulty": "intermediate",
+        "similar_ports": [21, 22, 23, 25]
+    },
+    "21": {
+        "protocol": "FTP (Control)",
+        "description": "Channel for sending file transfer commands",
+        "transport": "TCP",
+        "common_usage": "FTP commands and responses",
+        "difficulty": "intermediate",
+        "similar_ports": [20, 22, 23, 25]
+    },
+    "22": {
+        "protocol": "SSH",
+        "description": "Encrypted channel for remote system control",
+        "transport": "TCP",
+        "common_usage": "Secure remote access and file transfer",
+        "difficulty": "intermediate",
+        "similar_ports": [20, 21, 23, 25]
+    },
+    "23": {
+        "protocol": "Telnet",
+        "description": "Basic text-based remote access without security",
+        "transport": "TCP",
+        "common_usage": "Remote login without encryption",
+        "difficulty": "beginner",
+        "similar_ports": [20, 21, 22, 25]
+    },
+    "25": {
+        "protocol": "SMTP",
+        "description": "Gateway for routing messages between mail servers",
+        "transport": "TCP",
+        "common_usage": "Sending emails",
+        "difficulty": "intermediate",
+        "similar_ports": [20, 21, 22, 23]
+    },
+    "53": {
+        "protocol": "DNS",
+        "description": "Internet's address book lookup service",
+        "transport": "TCP/UDP",
+        "common_usage": "Translating domain names to IP addresses",
+        "difficulty": "intermediate",
+        "similar_ports": [67, 68, 80, 443]
+    },
+    "67": {
+        "protocol": "DHCP (Server)",
+        "description": "Automatic network configuration distributor",
+        "transport": "UDP",
+        "common_usage": "Assigning IP addresses to clients",
+        "difficulty": "beginner",
+        "similar_ports": [68, 53, 123, 161]
+    },
+    "68": {
+        "protocol": "DHCP (Client)",
+        "description": "Network configuration request handler",
+        "transport": "UDP",
+        "common_usage": "Obtaining IP configuration from server",
+        "difficulty": "beginner",
+        "similar_ports": [67, 53, 123, 161]
+    },
+    "80": {
+        "protocol": "HTTP",
+        "description": "Standard web content delivery service",
+        "transport": "TCP",
+        "common_usage": "Web traffic",
+        "difficulty": "beginner",
+        "similar_ports": [53, 443, 8080, 8443]
+    },
+    "110": {
+        "protocol": "POP3",
+        "description": "One-way email retrieval service",
+        "transport": "TCP",
+        "common_usage": "Retrieving emails from mail server",
+        "difficulty": "intermediate",
+        "similar_ports": [143, 25, 993, 995]
+    },
+    "123": {
+        "protocol": "NTP",
+        "description": "Global clock synchronization service",
+        "transport": "UDP",
+        "common_usage": "Time synchronization",
+        "difficulty": "beginner",
+        "similar_ports": [67, 68, 161, 514]
+    },
+    "137": {
+        "protocol": "NetBIOS-NS",
+        "description": "Legacy Windows computer name resolver",
+        "transport": "UDP",
+        "common_usage": "Windows name resolution",
+        "difficulty": "intermediate",
+        "similar_ports": [138, 139, 445]
+    },
+    "138": {
+        "protocol": "NetBIOS-DGM",
+        "description": "Legacy Windows network broadcast service",
+        "transport": "UDP",
+        "common_usage": "Windows networking datagram service",
+        "difficulty": "intermediate",
+        "similar_ports": [137, 139, 445]
+    },
+    "139": {
+        "protocol": "NetBIOS-SSN",
+        "description": "Original Windows network sharing service",
+        "transport": "TCP",
+        "common_usage": "Windows file and printer sharing",
+        "difficulty": "intermediate",
+        "similar_ports": [137, 138, 445]
+    },
+    "143": {
+        "protocol": "IMAP",
+        "description": "Interactive mailbox management service",
+        "transport": "TCP",
+        "common_usage": "Managing emails on a server",
+        "difficulty": "intermediate",
+        "similar_ports": [110, 25, 993, 995]
+    },
+    "161": {
+        "protocol": "SNMP",
+        "description": "Network equipment monitoring and control",
+        "transport": "UDP",
+        "common_usage": "Network device monitoring",
+        "difficulty": "intermediate",
+        "similar_ports": [162, 514, 123, 67]
+    },
+    "427": {
+        "protocol": "SLP",
+        "description": "Network resource discovery system",
+        "transport": "TCP/UDP",
+        "common_usage": "Service discovery on a local network",
+        "difficulty": "intermediate",
+        "similar_ports": [137, 138, 139, 445]
+    },
+    "443": {
+        "protocol": "HTTPS",
+        "description": "Encrypted web content delivery service",
+        "transport": "TCP",
+        "common_usage": "Secure web traffic",
+        "difficulty": "beginner",
+        "similar_ports": [80, 8080, 8443, 53]
+    },
+    "445": {
+        "protocol": "SMB",
+        "description": "Modern Windows file and printer sharing",
+        "transport": "TCP",
+        "common_usage": "File sharing on Windows networks",
+        "difficulty": "intermediate",
+        "similar_ports": [139, 21, 22, 80]
+    },
+    "514": {
+        "protocol": "Syslog",
+        "description": "Centralized system event collector",
+        "transport": "UDP",
+        "common_usage": "Collecting log messages",
+        "difficulty": "intermediate",
+        "similar_ports": [161, 123, 67, 68]
+    },
+    "548": {
+        "protocol": "AFP",
+        "description": "Mac-specific network sharing service",
+        "transport": "TCP",
+        "common_usage": "File sharing on Apple networks",
+        "difficulty": "intermediate",
+        "similar_ports": [445, 139, 21, 22]
+    },
+    "993": {
+        "protocol": "IMAP over SSL",
+        "description": "Encrypted interactive mailbox management",
+        "transport": "TCP",
+        "common_usage": "Retrieving and managing emails securely",
+        "difficulty": "intermediate",
+        "similar_ports": [143, 110, 995, 25]
+    },
+    "995": {
+        "protocol": "POP3 over SSL",
+        "description": "Encrypted one-way email retrieval",
+        "transport": "TCP",
+        "common_usage": "Secure retrieval of emails",
+        "difficulty": "intermediate",
+        "similar_ports": [110, 993, 25, 143]
+    },
+    "1433": {
+        "protocol": "MS SQL",
+        "description": "Microsoft's enterprise database engine",
+        "transport": "TCP",
+        "common_usage": "Microsoft SQL database connections",
+        "difficulty": "intermediate",
+        "similar_ports": [3306, 5432, 1521, 27017]
+    },
+    "1434": {
+        "protocol": "SQL Browser",
+        "description": "Microsoft database instance finder",
+        "transport": "UDP",
+        "common_usage": "SQL Server instance discovery",
+        "difficulty": "intermediate",
+        "similar_ports": [1433, 3306, 5432, 27017]
+    },
+    "3306": {
+        "protocol": "MySQL",
+        "description": "Popular open-source database engine",
+        "transport": "TCP",
+        "common_usage": "Connecting to MySQL database",
+        "difficulty": "intermediate",
+        "similar_ports": [1433, 5432, 1521, 27017]
+    },
+    "3389": {
+        "protocol": "RDP",
+        "description": "Windows graphical remote access service",
+        "transport": "TCP",
+        "common_usage": "Remote access to Windows systems",
+        "difficulty": "beginner",
+        "similar_ports": [22, 23, 5900, 8080]
+    },
+    "5357": {
+        "protocol": "WSDAPI",
+        "description": "Windows device communication framework",
+        "transport": "TCP",
+        "common_usage": "Device discovery and communication",
+        "difficulty": "intermediate",
+        "similar_ports": [427, 5900, 8080]
+    },
+    "5432": {
+        "protocol": "PostgreSQL",
+        "description": "Advanced SQL database engine",
+        "transport": "TCP",
+        "common_usage": "PostgreSQL database connections",
+        "difficulty": "intermediate",
+        "similar_ports": [3306, 1433, 1521, 27017]
+    },
+    "5900": {
+        "protocol": "VNC",
+        "description": "Platform-independent screen sharing",
+        "transport": "TCP",
+        "common_usage": "Remote desktop access",
+        "difficulty": "beginner",
+        "similar_ports": [3389, 22, 23]
+    },
+    "8080": {
+        "protocol": "HTTP Alternate",
+        "description": "Secondary web content delivery service",
+        "transport": "TCP",
+        "common_usage": "Web traffic on alternate port or proxy",
+        "difficulty": "beginner",
+        "similar_ports": [80, 443, 8443]
+    },
+    "8443": {
+        "protocol": "HTTPS Alternate",
+        "description": "Secondary encrypted web service",
+        "transport": "TCP",
+        "common_usage": "Secure web traffic on alternate port or proxy",
+        "difficulty": "beginner",
+        "similar_ports": [443, 80, 8080]
+    },
+    "27017": {
+        "protocol": "MongoDB",
+        "description": "Document-based NoSQL database engine",
+        "transport": "TCP",
+        "common_usage": "MongoDB database connections",
+        "difficulty": "intermediate",
+        "similar_ports": [3306, 1433, 5432]
+    }
+}
