@@ -128,9 +128,27 @@ jobs:
           $bytes = [Convert]::FromBase64String($env:WINDOWS_CODESIGN_P12)
           [System.IO.File]::WriteAllBytes("codesign.p12", $bytes)
           
+          Write-Host "`nLocating latest signtool version..."
+          $sdkRoot = "${env:ProgramFiles(x86)}\Windows Kits\10\bin"
+          $latestVersion = Get-ChildItem -Path $sdkRoot | 
+            Where-Object { $_.PSIsContainer } |
+            Sort-Object -Property Name -Descending |
+            Select-Object -First 1
+          $signtool = Join-Path $latestVersion.FullName "x64\signtool.exe"
+          
+          Write-Host "Found signtool at: $signtool"
+          if (-not (Test-Path $signtool)) {
+              Write-Error "Signtool not found at expected location!"
+              exit 1
+          }
+          
           Write-Host "`nSigning binary..."
-          & "signtool.exe" sign /f "codesign.p12" /p $env:WINDOWS_CODESIGN_PASSWORD `
-            /tr http://timestamp.digicert.com /td sha384 /fd sha384 `
+          & $signtool sign `
+            /f "codesign.p12" `
+            /p $env:WINDOWS_CODESIGN_PASSWORD `
+            /tr http://timestamp.digicert.com `
+            /td sha384 `
+            /fd sha384 `
             $binary.FullName `
             /v
             
