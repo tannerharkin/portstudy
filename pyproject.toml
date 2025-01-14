@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "portstudy"
-version = "2.4.0"
+version = "2.4.1"
 description = "A certification/test practice utility for learning network ports and protocols"
 readme = "README.md"
 requires-python = ">=3.8"
