@@ -80,15 +80,22 @@ jobs:
   create-draft:
     needs: build
     runs-on: windows-latest
-    environment: release-build
+    environment: release
     steps:
       - uses: actions/checkout@v4
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
-          merge-multiple: true
+          path: zipped-artifacts
+
+      - name: Extract artifacts
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "zipped-artifacts" -Filter "*.zip" | 
+            ForEach-Object {
+              Expand-Archive -Path $_.FullName -DestinationPath "dist" -Force
+            }
 
       - name: Sign Windows binary
         if: env.WINDOWS_CODESIGN_P12
