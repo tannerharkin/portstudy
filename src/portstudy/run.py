@@ -28,15 +28,19 @@ def main():
     # provides better Unicode support than the cmd.exe shell PyInstaller uses by default.
     if platform.system().lower() == "windows":
         if not os.environ.get("WT_SESSION"):
-            args = [sys.executable] + sys.argv
-            
             try:
                 # Hide the console window
                 hide_console()
                 
-                # Start Windows Terminal and wait for it to complete
+                # Get the path to our executable
+                if getattr(sys, 'frozen', False):
+                    executable_path = sys.executable
+                else:
+                    executable_path = sys.argv[0]
+                
+                # Start Windows Terminal with our executable
                 process = subprocess.Popen(
-                    ["wt.exe", "--"] + args,
+                    ["wt.exe", "--", executable_path] + sys.argv[1:],
                     creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
                 )
                 process.wait()
