@@ -89,6 +89,7 @@ jobs:
         run: |
           pyinstaller --clean --onefile \
             --name "${{ matrix.asset_name }}-dev-${{ steps.sha.outputs.short_sha }}" \
+            --add-data "src/portstudy/data/ports.json:portstudy/data" \ 
             src/portstudy/run.py
 
       - uses: actions/upload-artifact@v4
