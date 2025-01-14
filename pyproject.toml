@@ -47,7 +47,7 @@ dev = [
 [project.scripts]
 portstudy = "portstudy.cli.main:main"
 
-[tool.hatch.build]
+[tool.hatch.build.targets.wheel]
 packages = ["src/portstudy"]
 include = [
     "src/portstudy/data/*.json",
