@@ -69,10 +69,7 @@ jobs:
         run: python -m build
 
       - name: Build binary
-        run: |
-          pyinstaller --clean --onefile \
-            --name ${{ matrix.asset_name }} \
-            src/portstudy/run.py
+        run: pyinstaller --clean --onefile --name ${{ matrix.asset_name }} src/portstudy/run.py
 
       - uses: actions/upload-artifact@v4
         with:
