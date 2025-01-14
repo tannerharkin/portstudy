@@ -87,34 +87,26 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: zipped-artifacts
-      
-      - name: Extract artifacts
+          path: artifacts
+
+      - name: Prepare release files
         shell: pwsh
         run: |
-          Write-Host "Current directory: $PWD"
-          Write-Host "Listing all directories:"
-          Get-ChildItem -Recurse | Select-Object FullName
-          
-          Write-Host "`nSearching for zip files in zipped-artifacts:"
-          $zipFiles = Get-ChildItem -Path "zipped-artifacts" -Filter "*.zip" -Recurse
-          $zipFiles | ForEach-Object { Write-Host "Found zip: $($_.FullName)" }
-          
-          Write-Host "`nCreating dist directory if it doesn't exist"
+          Write-Host "Creating dist directory..."
           New-Item -ItemType Directory -Force -Path "dist"
           
-          Write-Host "`nExtracting zip files:"
-          $zipFiles | ForEach-Object {
-              Write-Host "Extracting $($_.FullName)..."
-              Write-Host "Zip file contents before extraction:"
-              Compress-Archive -LiteralPath $_.FullName -ListContent
-              
-              Expand-Archive -Path $_.FullName -DestinationPath "dist" -Force
-              Write-Host "Extraction complete"
+          Write-Host "`nLocating release files in artifacts directory:"
+          Get-ChildItem -Path "artifacts" -Recurse | ForEach-Object {
+            Write-Host "Found: $($_.FullName)"
           }
           
-          Write-Host "`nContents of dist directory after extraction:"
-          Get-ChildItem -Path "dist" -Recurse | Select-Object FullName
+          Write-Host "`nMoving files to dist directory..."
+          Move-Item -Path "artifacts/**/portstudy-*" -Destination "dist/" -Force
+          
+          Write-Host "`nFinal contents of dist directory:"
+          Get-ChildItem -Path "dist" | ForEach-Object {
+            Write-Host "Release file: $($_.FullName)"
+          }
 
       - name: Sign Windows binary
         env:
@@ -123,22 +115,27 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "Starting signing process..."
-          Write-Host "Current directory: $PWD"
-          Write-Host "`ndist directory contents:"
-          Get-ChildItem -Path "dist" -Recurse | Select-Object FullName
+          
+          Write-Host "`nLocating Windows binary in dist:"
+          $binary = Get-ChildItem -Path "dist/portstudy-windows.exe"
+          Write-Host "Found binary: $($binary.FullName)"
           
           Write-Host "`nCreating certificate file..."
-          [Convert]::FromBase64String($env:WINDOWS_CODESIGN_P12) | 
-            Set-Content -Path "codesign.p12" -Encoding Byte
-          Write-Host "Certificate file created"
+          $bytes = [Convert]::FromBase64String($env:WINDOWS_CODESIGN_P12)
+          [System.IO.File]::WriteAllBytes("codesign.p12", $bytes)
           
           Write-Host "`nSigning binary..."
           & "signtool.exe" sign /f "codesign.p12" /p $env:WINDOWS_CODESIGN_PASSWORD `
             /tr http://timestamp.digicert.com /td sha384 /fd sha384 `
-            "dist/portstudy-windows.exe"
+            $binary.FullName `
+            /v
             
-          Write-Host "`nCleaning up certificate..."
           Remove-Item -Path "codesign.p12" -Force
-          
-          Write-Host "`nFinal contents of dist directory:"
-          Get-ChildItem -Path "dist" -Recurse | Select-Object FullName
+          Write-Host "Certificate removed"
+
+      - name: Create Draft Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: dist/*
+          generate_release_notes: true
