@@ -72,7 +72,7 @@ jobs:
         run: |
           pyinstaller --clean --onefile \
             --name ${{ matrix.asset_name }} \
-            src/portstudy/cli/main.py
+            src/portstudy/run.py
 
       - uses: actions/upload-artifact@v4
         with:
