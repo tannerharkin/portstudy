@@ -1,0 +1,117 @@
+name: Release Build
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify release conditions
+        run: |
+          # Check repository owner
+          if [ "$GITHUB_REPOSITORY_OWNER" != "tannerharkin" ]; then
+            echo "Notice: This workflow is for official PortStudy releases only."
+            echo "For development builds, see build-dev.yml workflow."
+            exit 1
+          fi
+          
+          # Verify tag format (vX.Y.Z)
+          if ! [[ $GITHUB_REF_NAME =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Tag must be in format vX.Y.Z"
+            exit 1
+          fi
+          
+          # Verify tag is on main branch
+          TAG_COMMIT=$(git rev-list -n 1 $GITHUB_REF_NAME)
+          MAIN_COMMIT=$(git rev-parse origin/main)
+          if [ "$TAG_COMMIT" != "$MAIN_COMMIT" ]; then
+            echo "Error: Release tag must be created on latest main branch commit"
+            exit 1
+          fi
+
+  build:
+    needs: compliance
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            asset_name: portstudy-linux
+          - os: windows-latest
+            asset_name: portstudy-windows
+          - os: macos-latest
+            asset_name: portstudy-macos
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build pyinstaller .[dev]
+
+      - name: Build PyPI packages
+        if: matrix.os == 'ubuntu-latest'
+        run: python -m build
+
+      - name: Build binary
+        run: |
+          pyinstaller --clean --onefile \
+            --name ${{ matrix.asset_name }} \
+            src/portstudy/cli/main.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-artifacts
+          path: dist/*
+          retention-days: 1
+
+  create-draft:
+    needs: build
+    runs-on: windows-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Sign Windows binary
+        if: env.WINDOWS_CODESIGN_P12
+        env:
+          WINDOWS_CODESIGN_P12: ${{ secrets.WINDOWS_CODESIGN_P12 }}
+          WINDOWS_CODESIGN_PASSWORD: ${{ secrets.WINDOWS_CODESIGN_PASSWORD }}
+        shell: pwsh
+        run: |
+          [Convert]::FromBase64String($env:WINDOWS_CODESIGN_P12) | 
+            Set-Content -Path "codesign.p12" -Encoding Byte
+          
+          & "signtool.exe" sign /f "codesign.p12" /p $env:WINDOWS_CODESIGN_PASSWORD `
+            /tr http://timestamp.digicert.com /td sha384 /fd sha384 `
+            "dist/portstudy-windows.exe"
+            
+          Remove-Item -Path "codesign.p12" -Force
+
+      - name: Create Draft Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: dist/*
+          generate_release_notes: true

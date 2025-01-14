@@ -1,0 +1,28 @@
+name: Publish Release to PyPI
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: publish
+      url: ${{ vars.PYPI_URL }}
+    steps:
+      - name: Download release assets
+        uses: actions/download-release-asset@v1
+        with:
+          pattern: '*.{whl,tar.gz}'
+          path: dist
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
+          repository-url: ${{ vars.PYPI_REPOSITORY_URL }}

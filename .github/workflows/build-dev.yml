@@ -1,0 +1,99 @@
+name: Development Build
+
+on:
+  pull_request:
+    branches: [ "dev" ]
+  push:
+    branches: [ "dev" ]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  # ---------------------------------
+  # 1. CodeQL Analysis
+  # ---------------------------------
+  codeql-analysis:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: python
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  # ---------------------------------
+  # 2. Build Job
+  # ---------------------------------
+  build:
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            asset_name: portstudy-linux
+          - os: windows-latest
+            asset_name: portstudy-windows
+          - os: macos-latest
+            asset_name: portstudy-macos
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Get short SHA
+        id: sha
+        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      # ---------------------------------
+      # 2a. Cache Dependencies
+      # ---------------------------------
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+          key: v1-${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/pyproject.toml', '**/setup.py') }}
+          restore-keys: |
+            v1-${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build pyinstaller .[dev]
+
+      - name: Build PyPI packages
+        if: matrix.os == 'ubuntu-latest'
+        run: python -m build
+
+      - name: Build binary
+        run: |
+          pyinstaller --clean --onefile \
+            --name "${{ matrix.asset_name }}-dev-${{ steps.sha.outputs.short_sha }}" \
+            src/portstudy/cli/main.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: portstudy-dev-${{ steps.sha.outputs.short_sha }}
+          path: dist/*
+          merge-multiple: true
+          retention-days: 1
