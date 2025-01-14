@@ -8,6 +8,18 @@ import sys
 import subprocess
 import platform
 import os
+import ctypes
+
+def hide_console():
+    """Hide the console window on Windows."""
+    kernel32 = ctypes.WinDLL('kernel32')
+    user32 = ctypes.WinDLL('user32')
+    get_window = kernel32.GetConsoleWindow
+    show_window = user32.ShowWindow
+    
+    window_handle = get_window()
+    if window_handle:
+        show_window(window_handle, 0)  # SW_HIDE = 0
 
 def main():
     # When packaged with PyInstaller, the entry point gets executed directly rather than
@@ -19,7 +31,17 @@ def main():
             args = [sys.executable] + sys.argv
             
             try:
-                subprocess.run(["wt.exe", "--"] + args, check=True)
+                # Hide the console window
+                hide_console()
+                
+                # Start Windows Terminal and wait for it to complete
+                process = subprocess.Popen(
+                    ["wt.exe", "--"] + args,
+                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
+                )
+                process.wait()
+                
+                # Exit immediately after subprocess completes
                 sys.exit(0)
             except (subprocess.CalledProcessError, FileNotFoundError):
                 # Fall back to direct execution if Windows Terminal isn't available
