@@ -108,6 +108,10 @@ jobs:
             Write-Host "Release file: $($_.FullName)"
           }
 
+      - name: Install Windows SDK
+        run: choco install windows-sdk-10.1 -y
+        shell: pwsh
+
       - name: Sign Windows binary
         env:
           WINDOWS_CODESIGN_P12: ${{ secrets.WINDOWS_CODESIGN_P12 }}
