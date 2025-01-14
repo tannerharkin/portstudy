@@ -80,7 +80,7 @@ jobs:
   create-draft:
     needs: build
     runs-on: windows-latest
-    environment: release
+    environment: release-build
     steps:
       - uses: actions/checkout@v4
 
